@@ -1,65 +1,42 @@
+// src/components/DataFetcher.jsx
 import { useEffect, useState } from "react";
 import axios from "axios";
 
 function DataFetcher() {
-  const [postId, setPostId] = useState(1);
   const [data, setData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    let isMounted = true;
+  const fetchDog = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
 
-    const fetchData = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+      const response = await axios.get(
+        "https://dog.ceo/api/breeds/image/random"
+      );
 
-        const response = await axios.get(
-          `https://jsonplaceholder.typicode.com/posts/${postId}`
-        );
-
-        if (isMounted) {
-          setData(response.data);
-        }
-      } catch (err) {
-        if (isMounted) {
-          setError(err.message || "Сталася помилка запиту");
-        }
-      } finally {
-        if (isMounted) {
-          setIsLoading(false);
-        }
-      }
-    };
-
-    fetchData();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [postId]);
-
-  const handleNextPost = () => {
-    setPostId((prev) => (prev < 10 ? prev + 1 : 1)); // крутимося 1–10
+      setData(response.data);
+    } catch (err) {
+      setError(err.message || "Сталася помилка запиту");
+    } finally {
+      setIsLoading(false);
+    }
   };
+
+  useEffect(() => {
+    fetchDog(); // загрузка при першому рендері
+  }, []);
 
   return (
     <section>
-      <h2>DataFetcher (useEffect + axios)</h2>
-      <p>
-        Дані завантажуються з <code>JSONPlaceholder</code> за допомогою{" "}
-        <code>axios</code>.
-      </p>
+      <h2>Dogs</h2>
 
-      <div style={{ marginBottom: "12px" }}>
-        <span>Поточний postId: {postId}</span>{" "}
-        <button type="button" onClick={handleNextPost}>
-          Завантажити наступний пост
-        </button>
-      </div>
+      <button type="button" onClick={fetchDog}>
+        Показати іншого песика
+      </button>
 
       {isLoading && <p>Завантаження даних...</p>}
 
@@ -67,8 +44,16 @@ function DataFetcher() {
 
       {!isLoading && !error && data && (
         <article>
-          <h3>{data.title}</h3>
-          <p>{data.body}</p>
+          <img
+            src={data.message}
+            alt="Dog"
+            style={{
+              width: "300px",
+              borderRadius: "16px",
+              marginTop: "16px",
+              boxShadow: "0 6px 14px rgba(0,0,0,0.2)",
+            }}
+          />
         </article>
       )}
     </section>
