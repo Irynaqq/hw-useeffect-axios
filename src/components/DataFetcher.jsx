@@ -1,4 +1,3 @@
-// src/components/DataFetcher.jsx
 import { useEffect, useState } from "react";
 import axios from "axios";
 
@@ -27,7 +26,7 @@ function DataFetcher() {
   };
 
   useEffect(() => {
-    fetchDog(); // загрузка при першому рендері
+    fetchDog();
   }, []);
 
   return (
